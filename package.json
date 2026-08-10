@@ -1,0 +1,37 @@
+{
+  "name": "bragado-informa-24-tv",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "version:bump": "node bump-version.js",
+    "build:android": "npm run version:bump && cross-env EXPO_TV=1 eas build -p android --profile production",
+    "build:preview": "npm run version:bump && eas build -p android --profile preview",
+    "build:produtv": "npm run version:bump && eas build -p android --profile production_tv"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-tvos/config-tv": "^0.1.4",
+    "expo": "~54.0.28",
+    "expo-application": "^7.0.8",
+    "expo-av": "^16.0.8",
+    "expo-dev-client": "~6.0.21",
+    "expo-device": "~8.0.10",
+    "expo-keep-awake": "~15.0.8",
+    "expo-linking": "^8.0.10",
+    "expo-notifications": "~0.32.17",
+    "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.15",
+    "expo-video": "^3.0.15",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "^5.6.2"
+  },
+  "private": true,
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
+}
