@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "297230679125",
+    "project_id": "bi24-tv",
+    "storage_bucket": "bi24-tv.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297230679125:android:e93c882f24fea5146d28dc",
+        "android_client_info": {
+          "package_name": "com.bi24.tv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1clc2p6uDQszeD-YKRZUtmwsfSLF0CHY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
