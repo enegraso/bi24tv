@@ -14,4 +14,4 @@ Deployment steps:
 1. Upload the PHP files (index.php, send_notification.php, edit_config.php, register_token.php) to /admin directory on the server.
 2. Set the ADMIN_PASSWORD environment variable in your hosting control panel or in the server environment.
 3. Ensure PHP has write permissions to create/update /admin/tokens.json and /admin/push_log.txt.
-4. Test: open https://tvbragado.com.ar/admin/, login, and test sending a notification.
+4. Test: open https://sib-2000.com.ar/bi24tv-app/, login, and test sending a notification.

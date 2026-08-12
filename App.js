@@ -2,104 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, StatusBar, Platform, AppState, Alert, Linking } from 'react-native';
 import * as Notifications from 'expo-notifications';
 // Use expo-av player in a dedicated PlayerScreen for compatibility with Expo Go
-import * as Updates from 'expo-updates';
 import * as Application from 'expo-application';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LAST_UPDATE_CHECK = 'LAST_UPDATE_CHECK';
-
-async function shouldCheckToday() {
-  const last = await AsyncStorage.getItem(LAST_UPDATE_CHECK);
-  if (!last) return true;
-
-  const lastDate = new Date(parseInt(last, 10));
-  const now = new Date();
-
-  return (
-    now.getFullYear() !== lastDate.getFullYear() ||
-    now.getMonth() !== lastDate.getMonth() ||
-    now.getDate() !== lastDate.getDate()
-  );
-}
-
-async function markCheckedToday() {
-  await AsyncStorage.setItem(LAST_UPDATE_CHECK, Date.now().toString());
-}
-
 // ───────────── Config ─────────────
-const DEFAULT_STREAM_URL = 'https://srv1053170.hstgr.cloud/hls/bragadotv.m3u8';
+const DEFAULT_STREAM_URL = 'https://vivo.solumedia.com:19360/bi24/bi24.m3u8';
 
 import { getConfig } from './services/remoteConfig';
-
-
-
-function getLocalVersion() {
-  return Application.nativeApplicationVersion || '1.0.0';
-}
-
-async function getPlayStoreVersion(packageName) {
-  const res = await fetch(`https://play.google.com/store/apps/details?id=${packageName}&hl=es`);
-  const html = await res.text();
-  const match = html.match(/\[\[\["([\d.]+)"\]\]/);
-  return match ? match[1] : null;
-}
-
-async function getAppStoreVersion(bundleId) {
-  const res = await fetch(`https://itunes.apple.com/lookup?bundleId=${bundleId}`);
-  const json = await res.json();
-  return json.results[0]?.version || null;
-}
-
-function isNewer(store, local) {
-  const a = store.split('.').map(Number);
-  const b = local.split('.').map(Number);
-
-  for (let i = 0; i < Math.max(a.length, b.length); i++) {
-    const av = a[i] || 0;
-    const bv = b[i] || 0;
-    if (av > bv) return true;
-    if (av < bv) return false;
-  }
-  return false;
-}
-
-async function checkStoreVersion() {
-  if (!(await shouldCheckToday())) return;
-  try {
-
-    const local = getLocalVersion();
-    let store = null;
-
-    if (Platform.OS === 'android') {
-      store = await getPlayStoreVersion('com.bragado.tvok');
-    } else if (Platform.OS === 'ios') {
-      store = await getAppStoreVersion('com.bragado.tvok');
-    }
-
-    if (store && isNewer(store, local)) {
-      await markCheckedToday();
-      Alert.alert(
-        'Actualización disponible',
-        'Hay una nueva versión de Bragado TV disponible.',
-        [
-          {
-            text: 'Actualizar',
-            onPress: () =>
-              Linking.openURL(
-                Platform.OS === 'android'
-                  ? 'https://play.google.com/store/apps/details?id=com.bragado.tvok'
-                  : 'https://apps.apple.com/app/idXXXXXXXX'
-              ),
-          },
-          { text: 'Más tarde', style: 'cancel' },
-        ]
-      );
-    }
-  } catch (e) {
-    console.log('Error verificando versión de tienda', e);
-  }
-}
 
 import HomeScreen from './screens/HomeScreen';
 import PlayerScreen from './screens/PlayerScreen';
@@ -114,6 +24,14 @@ export default function App() {
   const [buttonBg, setButtonBg] = useState('rgba(255,255,255,0.08)');
   const [textColor, setTextColor] = useState('#ffffff');
   const [slogan, setSlogan] = useState('Canal de streaming en vivo desde Bragado...');
+  const [webUrl, setWebUrl] = useState('https://bragadoinforma.com.ar');
+  const [whatsapp, setWhatsapp] = useState(null);
+  const [facebook, setFacebook] = useState(null);
+  const [instagram, setInstagram] = useState(null);
+  const [twitter, setTwitter] = useState(null);
+  const [tiktok, setTiktok] = useState(null);
+  const [youtube, setYoutube] = useState(null);
+  const [mail, setMail] = useState(null);
   const [buttonFocusBorder, setButtonFocusBorder] = useState('#ffffff');
   const [buttonFocusWidth, setButtonFocusWidth] = useState(3);
   const [showHome, setShowHome] = useState(true);
@@ -121,38 +39,34 @@ export default function App() {
   // Note: the original implementation used expo-video's native player.
   // For Expo Go compatibility we render a separate expo-av based PlayerScreen.
 
-  // ───────────── Init: remote config + OTA ─────────────
-  useEffect(() => {
-    let isMounted = true;
-
-  async function init() {
-      try {
-        const cfg = await getConfig();
-        if (!isMounted) return;
-        if (cfg?.stream) setStreamUrl(cfg.stream);
-        if (cfg?.logo) setLogoUrl(cfg.logo);
-        if (cfg?.fondo) setBgColor(cfg.fondo);
-        if (cfg?.botonfondo) setButtonBg(cfg.botonfondo);
-        if (cfg?.colorletras) setTextColor(cfg.colorletras);
-        if (cfg?.slogan) setSlogan(cfg.slogan);
-        if (cfg?.boton_border) setButtonFocusBorder(cfg.boton_border);
-        if (cfg?.boton_border_width) setButtonFocusWidth(parseInt(cfg.boton_border_width,10) || 3);
-      } catch (e) {
-        console.log('Config remota no disponible, usando default');
-      }
-
-      try {
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          await Updates.fetchUpdateAsync();
-          await Updates.reloadAsync();
-        }
-      } catch (e) { }
-
-      checkStoreVersion();
+  // ───────────── Config loader (reusable) ─────────────
+  async function loadConfig() {
+    try {
+      const cfg = await getConfig();
+      if (cfg?.stream) setStreamUrl(cfg.stream);
+      if (cfg?.logo) setLogoUrl(cfg.logo);
+      if (cfg?.fondo) setBgColor(cfg.fondo);
+      if (cfg?.botonfondo) setButtonBg(cfg.botonfondo);
+      if (cfg?.colorletras) setTextColor(cfg.colorletras);
+      if (cfg?.slogan) setSlogan(cfg.slogan);
+      if (cfg?.web_url) setWebUrl(cfg.web_url);
+      if (cfg?.whatsapp) setWhatsapp(cfg.whatsapp);
+      if (cfg?.facebook) setFacebook(cfg.facebook);
+      if (cfg?.instagram) setInstagram(cfg.instagram);
+      if (cfg?.twitter) setTwitter(cfg.twitter);
+      if (cfg?.tiktok) setTiktok(cfg.tiktok);
+      if (cfg?.youtube) setYoutube(cfg.youtube);
+      if (cfg?.mail) setMail(cfg.mail);
+      if (cfg?.boton_border) setButtonFocusBorder(cfg.boton_border);
+      if (cfg?.boton_border_width) setButtonFocusWidth(parseInt(cfg.boton_border_width,10) || 3);
+    } catch (e) {
+      console.log('Config remota no disponible, usando default');
     }
+  }
 
-    init();
+  // ───────────── Init: remote config ─────────────
+  useEffect(() => {
+    loadConfig();
 
     // Request notification permission on first app start (one-time prompt)
     (async () => {
@@ -161,7 +75,6 @@ export default function App() {
         if (!asked) {
           const perm = await Notifications.getPermissionsAsync();
           if (perm.status !== 'granted') {
-            // prompt the user on first run
             await Notifications.requestPermissionsAsync();
           }
           await AsyncStorage.setItem('NOTIF_PROMPTED_V1', '1');
@@ -170,11 +83,12 @@ export default function App() {
         console.log('error requesting notif perm on start', e);
       }
     })();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  // ───────────── Refresh config when returning to HomeScreen ─────────────
+  useEffect(() => {
+    if (showHome) loadConfig();
+  }, [showHome]);
 
   // Notification handlers: foreground display via an Alert/modal and response handling
   useEffect(() => {
@@ -238,6 +152,14 @@ export default function App() {
           buttonBg={buttonBg}
           textColor={textColor}
           slogan={slogan}
+          webUrl={webUrl}
+          whatsapp={whatsapp}
+          facebook={facebook}
+          instagram={instagram}
+          twitter={twitter}
+          tiktok={tiktok}
+          youtube={youtube}
+          mail={mail}
           buttonFocusBorder={buttonFocusBorder}
           buttonFocusWidth={buttonFocusWidth}
         />

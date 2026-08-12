@@ -6,7 +6,7 @@ export async function getConfig() {
   // fondo: #000000
   // botonfondo: #222222
   // colorletras: #ffffff
-    const url = 'https://tvbragado.com.ar/admin/config.txt';
+    const url = 'https://sib-2000.com.ar/bi24tv-app/config.txt';
   try {
     const res = await fetch(url, { cache: 'no-store' });
     const text = await res.text();
@@ -33,11 +33,19 @@ export async function getConfig() {
       botonfondo: values.botonfondo || null,
       colorletras: values.colorletras || null,
       slogan: values.slogan || null,
+      web_url: values.web_url || null,
+      whatsapp: values.whatsapp || null,
+      facebook: values.facebook || null,
+      instagram: values.instagram || null,
+      twitter: values.twitter || null,
+      tiktok: values.tiktok || null,
+      youtube: values.youtube || null,
+      mail: values.mail || null,
       boton_border: values.boton_border || null,
       boton_border_width: values.boton_border_width || null,
     };
   } catch (e) {
     console.log('remoteConfig: failed to fetch', e);
-    return { logo: null, stream: null, fondo: null, botonfondo: null, colorletras: null };
+    return { logo: null, stream: null, fondo: null, botonfondo: null, colorletras: null, web_url: null, whatsapp: null, facebook: null, instagram: null, twitter: null, tiktok: null, youtube: null, mail: null };
   }
 }

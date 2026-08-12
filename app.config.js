@@ -6,29 +6,39 @@ export default {
     orientation: "default",          // "default" permite rotar en celus y fijar en TVs
     icon: "./assets/icon.png",       // Reemplaza por tu nuevo ícono cuando lo tengas
     scheme: "bi24tv",
+    owner: "enegraso",
     userInterfaceStyle: "dark",
+    extra: {
+      eas: {
+        projectId: "9bf10626-fede-43f0-a546-5c477ee1fd63"
+      }
+    },
+    
+    // OTA updates activados para buscar actualizaciones en Play Store
+    updates: {
+      enabled: true,
+      checkAutomatically: "ON_LAUNCH"
+    },
     
     splash: {
-      image: "./assets/splash.png",  // Reemplaza por tu nueva pantalla de carga
-      resizeMode: "contain",
-      backgroundColor: "#050505"
+      image: "./assets/splash-icon.png",
+      resizeMode: "cover",
+      backgroundColor: "#000000"
     },
     
     // Configuración obligatoria para Android Celulares y Android TV
     android: {
       package: "com.bi24.tv",        // Tu nuevo ID de paquete único
       versionCode: 1,
-      intentFilters: [],
+      googleServicesFile: "./google-services.json",
+      tvBanner: "./assets/icon.png",
       // Mantenemos la compatibilidad nativa con controles de Smart TV
       intentFilters: [
         {
           action: "MAIN",
-          category: ["LEANBACK_LAUNCHER", "LAUNCHER"] // Permite que aparezca en el menú de Android TV
+          category: ["LEANBACK_LAUNCHER", "LAUNCHER"]
         }
       ],
-      /* COMENTADO HASTA TENER EL ARCHIVO DE FIREBASE
-      googleServicesFile: "./google-services.json"
-      */
     },
 
     /* COMENTADO: NO SE CONTEMPLA IOS POR EL MOMENTO

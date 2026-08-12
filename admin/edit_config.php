@@ -55,7 +55,7 @@ function write_config($path, $logo, $stream, $extras)
   $lines = [];
   $lines[] = trim($logo);
   $lines[] = trim($stream);
-  foreach (['fondo', 'botonfondo', 'colorletras', 'slogan', 'boton_border', 'boton_border_width'] as $k) {
+  foreach (['fondo', 'botonfondo', 'colorletras', 'slogan', 'web_url', 'whatsapp', 'facebook', 'instagram', 'twitter', 'tiktok', 'youtube', 'mail', 'boton_border', 'boton_border_width'] as $k) {
     if (isset($extras[$k])) $lines[] = "$k: " . trim($extras[$k]);
   }
   return file_put_contents($path, implode("\n", $lines) . "\n") !== false;
@@ -70,6 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $botonfondo = $_POST['botonfondo'] ?? 'rgba(255,255,255,0.08)';
   $colorletras = $_POST['colorletras'] ?? '#ffffff';
   $slogan = $_POST['slogan'] ?? '';
+  $web_url = $_POST['web_url'] ?? '';
+  $whatsapp = $_POST['whatsapp'] ?? '';
+  $facebook = $_POST['facebook'] ?? '';
+  $instagram = $_POST['instagram'] ?? '';
+  $twitter = $_POST['twitter'] ?? '';
+  $tiktok = $_POST['tiktok'] ?? '';
+  $youtube = $_POST['youtube'] ?? '';
+  $mail = $_POST['mail'] ?? '';
   $boton_border = $_POST['boton_border'] ?? '';
   $boton_border_width = $_POST['boton_border_width'] ?? '';
 
@@ -78,6 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     'botonfondo' => $botonfondo,
     'colorletras' => $colorletras,
     'slogan' => $slogan,
+    'web_url' => $web_url,
+    'whatsapp' => $whatsapp,
+    'facebook' => $facebook,
+    'instagram' => $instagram,
+    'twitter' => $twitter,
+    'tiktok' => $tiktok,
+    'youtube' => $youtube,
+    'mail' => $mail,
     'boton_border' => $boton_border,
     'boton_border_width' => $boton_border_width
   ];
@@ -171,7 +187,7 @@ $bb_hex = extract_hex($extras['boton_border'] ?? '#ffffff') ?? '#ffffff';
 
   <!-- Top Bar -->
   <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-lg border-b border-white/5">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <a href="index.php" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition">
           <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -187,7 +203,7 @@ $bb_hex = extract_hex($extras['boton_border'] ?? '#ffffff') ?? '#ffffff';
 
   <?php if (!empty($_SESSION['admin'])) include __DIR__ . '/stream_status.php'; ?>
 
-  <main class="max-w-3xl mx-auto px-4 py-6 pb-24">
+  <main class="max-w-5xl mx-auto px-4 pt-16 pb-24">
 
     <!-- Toast Message -->
     <?php if ($message): ?>
@@ -203,8 +219,9 @@ $bb_hex = extract_hex($extras['boton_border'] ?? '#ffffff') ?? '#ffffff';
 
     <form method="post" enctype="multipart/form-data">
 
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <!-- Card: Logo & Stream -->
-      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6 mb-5">
+      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-5">
           <div class="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
             <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -248,22 +265,31 @@ $bb_hex = extract_hex($extras['boton_border'] ?? '#ffffff') ?? '#ffffff';
         <div class="mb-4">
           <label class="block text-sm font-medium text-slate-400 mb-1.5">Stream URL (HLS)</label>
           <input type="text" name="stream" value="<?php echo htmlspecialchars($stream); ?>"
-                 placeholder="https://.../bragadotv.m3u8"
+                 placeholder="https://.../stream.m3u8"
                  class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
         </div>
 
         <!-- Slogan -->
-        <div>
+        <div class="mb-4">
           <label class="block text-sm font-medium text-slate-400 mb-1.5">Slogan</label>
           <input id="slogan_text" type="text" name="slogan"
                  value="<?php echo htmlspecialchars($extras['slogan'] ?? 'Canal de streaming en vivo desde Bragado. Programación local, noticias y entrevistas.'); ?>"
                  placeholder="Texto corto para slogan"
                  class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
         </div>
+
+        <!-- Web Oficial URL -->
+        <div>
+          <label class="block text-sm font-medium text-slate-400 mb-1.5">URL Web Oficial</label>
+          <input type="text" name="web_url"
+                 value="<?php echo htmlspecialchars($extras['web_url'] ?? ''); ?>"
+                 placeholder="https://bragadoinforma.com.ar"
+                 class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+        </div>
       </div>
 
       <!-- Card: Colores de la App -->
-      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6 mb-5">
+      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-5">
           <div class="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
             <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
@@ -308,7 +334,7 @@ $bb_hex = extract_hex($extras['boton_border'] ?? '#ffffff') ?? '#ffffff';
       </div>
 
       <!-- Card: Ajustes TV -->
-      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6 mb-6">
+      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-5">
           <div class="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
             <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -339,6 +365,65 @@ $bb_hex = extract_hex($extras['boton_border'] ?? '#ffffff') ?? '#ffffff';
             <span class="text-sm text-slate-500">px</span>
           </div>
         </div>
+      </div>
+
+      <!-- Card: Redes Sociales -->
+      <div class="bg-slate-900/60 border border-white/5 rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-slate-200">Redes Sociales</h2>
+            <p class="text-xs text-slate-500">Links visibles en la app (celular). Si vacío, no se muestra el botón.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">WhatsApp (formato: 549XXXXXXXXXX)</label>
+            <input type="text" name="whatsapp" value="<?php echo htmlspecialchars($extras['whatsapp'] ?? ''); ?>"
+                   placeholder="5492342480567"
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">Facebook</label>
+            <input type="text" name="facebook" value="<?php echo htmlspecialchars($extras['facebook'] ?? ''); ?>"
+                   placeholder="https://facebook.com/..."
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">Instagram</label>
+            <input type="text" name="instagram" value="<?php echo htmlspecialchars($extras['instagram'] ?? ''); ?>"
+                   placeholder="https://instagram.com/..."
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">X (Twitter)</label>
+            <input type="text" name="twitter" value="<?php echo htmlspecialchars($extras['twitter'] ?? ''); ?>"
+                   placeholder="https://x.com/..."
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">TikTok</label>
+            <input type="text" name="tiktok" value="<?php echo htmlspecialchars($extras['tiktok'] ?? ''); ?>"
+                   placeholder="https://tiktok.com/@..."
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">YouTube</label>
+            <input type="text" name="youtube" value="<?php echo htmlspecialchars($extras['youtube'] ?? ''); ?>"
+                   placeholder="https://youtube.com/..."
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-1.5">Email</label>
+            <input type="text" name="mail" value="<?php echo htmlspecialchars($extras['mail'] ?? ''); ?>"
+                   placeholder="mailto:..."
+                   class="w-full px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition"/>
+          </div>
+        </div>
+      </div>
       </div>
 
       <!-- Actions -->

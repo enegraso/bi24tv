@@ -2,7 +2,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
 // tokens endpoint hosted under /admin on the site
-const SERVER_REGISTER_URL = 'https://tvbragado.com.ar/admin/register_token.php';
+const SERVER_REGISTER_URL = 'https://sib-2000.com.ar/bi24tv-app/register_token.php';
 
 export async function getExpoPushTokenAsync() {
   if (!Device.isDevice) return null;
@@ -14,7 +14,7 @@ export async function getExpoPushTokenAsync() {
   }
   if (finalStatus !== 'granted') return null;
   const tokenData = await Notifications.getExpoPushTokenAsync({
-    projectId: 'e72fcaf9-08bb-4061-ad2e-b63685caad89'
+    projectId: '9bf10626-fede-43f0-a546-5c477ee1fd63'
   });
   return tokenData.data;
 }
