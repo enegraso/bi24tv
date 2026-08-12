@@ -26,6 +26,7 @@ bi24-tv-firebase-adminsdk-*.json
 # We commit PHP admin scripts but keep credentials and data files ignored
 admin/tokens.json
 admin/*.p8
+admin/config.txt
 admin/push_log.txt
 admin/*.json
 
