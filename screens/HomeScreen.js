@@ -16,8 +16,10 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
   const [showWeb, setShowWeb] = useState(false);
   const [gearFocused, setGearFocused] = useState(false);
   const [starFocused, setStarFocused] = useState(false);
+  const [exitFocused, setExitFocused] = useState(false);
   const gearAnim = useRef(new Animated.Value(0)).current;
   const starAnim = useRef(new Animated.Value(0)).current;
+  const exitAnim = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
 
   return (
@@ -52,6 +54,22 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
         </Pressable>
       )}
 
+      {!Platform.isTV && (
+        <Pressable
+          style={[styles.gear, { top: (insets.top || 10) + 88 }]}
+          focusable={true}
+          accessible={true}
+          onFocus={() => { setExitFocused(true); Animated.timing(exitAnim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); }}
+          onBlur={() => { setExitFocused(false); Animated.timing(exitAnim, { toValue: 0, duration: 120, easing: Easing.in(Easing.ease), useNativeDriver: true }).start(); }}
+          onPress={() => BackHandler.exitApp()}
+          accessibilityLabel="Salir de la app"
+        >
+          <Animated.View style={[{ transform: [{ scale: exitAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.06] }) }] }, exitFocused ? { borderWidth: buttonFocusWidth, borderColor: buttonFocusBorder, borderRadius: 8, padding: 6 } : { padding: 6 }] }>
+            <Text style={{color:textColor,fontSize:20}}>🚪</Text>
+          </Animated.View>
+        </Pressable>
+      )}
+
       <ScrollView contentContainerStyle={[styles.scrollContainer, { paddingBottom: (insets.bottom || 12) + 24 }] }>
         <Image source={source} style={styles.logo} resizeMode="contain" />
         <Text style={subtitleStyle}>{slogan}</Text>
@@ -64,13 +82,13 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
           <FocusableButton label="CERRAR" onPress={() => BackHandler.exitApp()} buttonStyle={buttonStyle} textStyle={textStyle} focusBorderColor={buttonFocusBorder} focusBorderWidth={buttonFocusWidth} />
         ) : (
           <View style={styles.socialRow}>
-            {whatsapp ? <SocialIcon label="w" color="#25D366" url={`https://wa.me/${whatsapp}`} /> : null}
-            {facebook ? <SocialIcon label="f" color="#1877F2" url={facebook} /> : null}
-            {instagram ? <SocialIcon label="ig" color="#E4405F" url={instagram} /> : null}
-            {twitter ? <SocialIcon label="X" color="#000" url={twitter} /> : null}
-            {tiktok ? <SocialIcon label="♪" color="#000" url={tiktok} /> : null}
-            {youtube ? <SocialIcon label="▶" color="#FF0000" url={youtube} /> : null}
-            {mail ? <SocialIcon label="✉" color="#EA4335" url={`mailto:${mail}`} /> : null}
+            {whatsapp ? <SocialIcon icon={require('../assets/social-whatsapp.webp')} url={`https://wa.me/${whatsapp}`} /> : null}
+            {facebook ? <SocialIcon icon={require('../assets/social-facebook.webp')} url={facebook} /> : null}
+            {instagram ? <SocialIcon icon={require('../assets/social-instagram.webp')} url={instagram} /> : null}
+            {twitter ? <SocialIcon icon={require('../assets/social-twitter.webp')} url={twitter} /> : null}
+            {tiktok ? <SocialIcon icon={require('../assets/social-tiktok.webp')} url={tiktok} /> : null}
+            {youtube ? <SocialIcon icon={require('../assets/social-youtube.webp')} url={youtube} /> : null}
+            {mail ? <SocialIcon icon={require('../assets/social-mail.webp')} url={`mailto:${mail}`} /> : null}
           </View>
         )}
       </ScrollView>
@@ -120,7 +138,7 @@ const styles = StyleSheet.create({
   ,
   gear: {
     position: 'absolute',
-    right: 10,
+    right: 20,
     padding: 8,
     zIndex: 10,
     backgroundColor: 'transparent'
@@ -134,23 +152,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
+    gap: 14,
     marginTop: 16,
   },
   socialBtn: {
-    margin: 4,
+    margin: 5,
   },
   socialIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
+    width: 56,
+    height: 56,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
-  socialLabel: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
+  socialLogo: {
+    width: 32,
+    height: 32,
   },
 });
 
@@ -173,7 +191,7 @@ function FocusableButton({ label, onPress, buttonStyle, textStyle, focusBorderCo
   );
 }
 
-function SocialIcon({ label, color, url }) {
+function SocialIcon({ icon, url }) {
   const [focused, setFocused] = useState(false);
   const anim = useRef(new Animated.Value(0)).current;
   const onFocus = () => { setFocused(true); Animated.timing(anim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); };
@@ -186,8 +204,8 @@ function SocialIcon({ label, color, url }) {
       onPress={() => Linking.openURL(url)}
       style={styles.socialBtn}
     >
-      <Animated.View style={[styles.socialIcon, { backgroundColor: color }, { transform: [{ scale: anim.interpolate({ inputRange: [0,1], outputRange: [1, 1.1] }) }] }, focused ? { borderWidth: 3, borderColor: '#fff' } : null]}>
-        <Text style={styles.socialLabel}>{label}</Text>
+      <Animated.View style={[styles.socialIcon, { transform: [{ scale: anim.interpolate({ inputRange: [0,1], outputRange: [1, 1.1] }) }] }, focused ? { borderWidth: 3, borderColor: '#fff' } : null]}>
+        <Image source={icon} style={styles.socialLogo} resizeMode="contain" />
       </Animated.View>
     </Pressable>
   );

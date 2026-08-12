@@ -23,14 +23,14 @@ export default {
     splash: {
       image: "./assets/splash-icon.png",
       resizeMode: "cover",
-      backgroundColor: "#000000"
+      backgroundColor: "#FFFFFF"
     },
     
     // Configuración obligatoria para Android Celulares y Android TV
     android: {
       package: "com.bi24.tv",        // Tu nuevo ID de paquete único
       versionCode: 1,
-      googleServicesFile: "./google-services.json",
+      googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
       tvBanner: "./assets/icon.png",
       // Mantenemos la compatibilidad nativa con controles de Smart TV
       intentFilters: [
