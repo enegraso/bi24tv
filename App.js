@@ -14,6 +14,8 @@ import { getConfig } from './services/remoteConfig';
 import HomeScreen from './screens/HomeScreen';
 import PlayerScreen from './screens/PlayerScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { checkForApkUpdate } from './services/checkUpdate';
+import UpdateModal from './components/UpdateModal';
 
 export default function App() {
   const isTV = Platform.isTV;
@@ -35,6 +37,7 @@ export default function App() {
   const [buttonFocusBorder, setButtonFocusBorder] = useState('#ffffff');
   const [buttonFocusWidth, setButtonFocusWidth] = useState(3);
   const [showHome, setShowHome] = useState(true);
+  const [apkUpdate, setApkUpdate] = useState(null);
 
   // Note: the original implementation used expo-video's native player.
   // For Expo Go compatibility we render a separate expo-av based PlayerScreen.
@@ -67,6 +70,11 @@ export default function App() {
   // ───────────── Init: remote config ─────────────
   useEffect(() => {
     loadConfig();
+
+    // Check for APK update (only on sideloaded installs)
+    checkForApkUpdate().then((update) => {
+      if (update) setApkUpdate(update);
+    });
 
     // Request notification permission on first app start (one-time prompt)
     (async () => {
@@ -143,6 +151,7 @@ export default function App() {
 
   // ───────────── Render ─────────────
   return (
+    <>
     <SafeAreaProvider>
       {showHome ? (
         <HomeScreen
@@ -167,6 +176,15 @@ export default function App() {
         <PlayerScreen streamUrl={streamUrl} onBack={() => setShowHome(true)} bgColor={bgColor} buttonBg={buttonBg} textColor={textColor} slogan={slogan} buttonFocusBorder={buttonFocusBorder} buttonFocusWidth={buttonFocusWidth} />
       )}
     </SafeAreaProvider>
+
+    <UpdateModal
+      visible={!!apkUpdate}
+      version={apkUpdate?.version}
+      apkUrl={apkUpdate?.apkUrl}
+      changelog={apkUpdate?.changelog}
+      onClose={() => setApkUpdate(null)}
+    />
+    </>
   );
 }
 
