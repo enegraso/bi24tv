@@ -54,3 +54,12 @@ yarn-error.*
 
 # env
 .env*
+
+# admin folder (deployed via FTP)
+admin/
+
+# credentials (keystores, certificates, Firebase keys)
+credentials/
+
+# documentation
+docs/

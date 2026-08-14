@@ -24,13 +24,6 @@ export async function checkForApkUpdate() {
   if (Platform.OS !== 'android') return null;
 
   try {
-    const source = await Application.getInstallationSourceAsync();
-    if (source === 'store') return null;
-  } catch {
-    return null;
-  }
-
-  try {
     const res = await fetch(VERSION_URL, { cache: 'no-store' });
     const remote = await res.json();
 

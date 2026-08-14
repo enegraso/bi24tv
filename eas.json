@@ -14,7 +14,8 @@
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "channel": "production"
     },
     "production_tv": {
       "extends": "production",

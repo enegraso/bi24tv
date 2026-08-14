@@ -1,13 +1,36 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Image, Pressable, StyleSheet, Linking, Modal, ScrollView, Animated, Easing, Platform, BackHandler } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { getExpoPushTokenAsync } from '../app/services/notifications';
 import SettingsScreen from '../app/screens/SettingsScreen';
 import WebScreen from './WebScreen';
+
+function darkenColor(hex, factor = 0.7) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${Math.round(r * factor)}, ${Math.round(g * factor)}, ${Math.round(b * factor)})`;
+}
+
+function lightenColor(hex, factor = 1.3) {
+  const r = Math.min(255, parseInt(hex.slice(1, 3), 16) * factor);
+  const g = Math.min(255, parseInt(hex.slice(3, 5), 16) * factor);
+  const b = Math.min(255, parseInt(hex.slice(5, 7), 16) * factor);
+  return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+}
+
+function isValidHex(color) {
+  return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(color);
+}
 
 export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonBg = 'rgba(255,255,255,0.08)', textColor = '#fff', slogan = 'Canal de streaming en vivo desde Bragado. Programación local, noticias y entrevistas.', webUrl = 'https://bragadoinforma.com.ar', whatsapp, facebook, instagram, twitter, tiktok, youtube, mail, buttonFocusBorder = '#fff', buttonFocusWidth = 3 }) {
   const source = logoUrl ? { uri: logoUrl } : require('../assets/react-logo.png');
 
-  const containerStyle = [styles.container, { backgroundColor: bgColor }];
+  const gradientColors = isValidHex(bgColor)
+    ? [darkenColor(bgColor, 0.6), bgColor, lightenColor(bgColor, 1.1)]
+    : [bgColor, bgColor, bgColor];
+
   const buttonStyle = [styles.button, { backgroundColor: buttonBg }];
   const textStyle = [styles.buttonText, { color: textColor }];
   const subtitleStyle = [styles.subtitle, { color: textColor }];
@@ -22,10 +45,16 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
   const exitAnim = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
 
+  useEffect(() => {
+    if (!Platform.isTV) {
+      getExpoPushTokenAsync();
+    }
+  }, []);
+
   return (
-    <View style={[containerStyle, { paddingTop: (insets.top || 12) + 40 }]}> 
+    <LinearGradient colors={gradientColors} style={[styles.container, { paddingTop: (insets.top || 12) + 40 }]}>
       <Pressable
-        style={[styles.gear, { top: (insets.top || 10) + 8 }]}
+        style={[styles.topButton, { top: (insets.top || 10) + 4 }]}
         focusable={true}
         accessible={true}
         onFocus={() => { setGearFocused(true); Animated.timing(gearAnim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); }}
@@ -33,14 +62,14 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
         onPress={() => setShowSettings(true)}
         accessibilityLabel="Abrir configuración"
       >
-        <Animated.View style={[{ transform: [{ scale: gearAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.06] }) }] }, gearFocused ? { borderWidth: buttonFocusWidth, borderColor: buttonFocusBorder, borderRadius: 8, padding: 6 } : { padding: 6 }] }>
-          <Text style={{color:textColor,fontSize:20}}>⚙️</Text>
+        <Animated.View style={[styles.topButtonInner, gearFocused && { borderColor: buttonFocusBorder, borderWidth: buttonFocusWidth }, { transform: [{ scale: gearAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.08] }) }] }]}>
+          <Text style={{color:textColor, fontSize:22}}>⚙️</Text>
         </Animated.View>
       </Pressable>
 
       {!Platform.isTV && (
         <Pressable
-          style={[styles.gear, { top: (insets.top || 10) + 48 }]}
+          style={[styles.topButton, { top: (insets.top || 10) + 60 }]}
           focusable={true}
           accessible={true}
           onFocus={() => { setStarFocused(true); Animated.timing(starAnim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); }}
@@ -48,15 +77,15 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
           onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.bi24.tv')}
           accessibilityLabel="Calificar app en Play Store"
         >
-          <Animated.View style={[{ transform: [{ scale: starAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.06] }) }] }, starFocused ? { borderWidth: buttonFocusWidth, borderColor: buttonFocusBorder, borderRadius: 8, padding: 6 } : { padding: 6 }] }>
-            <Text style={{color:textColor,fontSize:20}}>⭐</Text>
+          <Animated.View style={[styles.topButtonInner, starFocused && { borderColor: buttonFocusBorder, borderWidth: buttonFocusWidth }, { transform: [{ scale: starAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.08] }) }] }]}>
+            <Text style={{color:textColor, fontSize:22}}>⭐</Text>
           </Animated.View>
         </Pressable>
       )}
 
       {!Platform.isTV && (
         <Pressable
-          style={[styles.gear, { top: (insets.top || 10) + 88 }]}
+          style={[styles.topButton, { top: (insets.top || 10) + 116 }]}
           focusable={true}
           accessible={true}
           onFocus={() => { setExitFocused(true); Animated.timing(exitAnim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); }}
@@ -64,8 +93,8 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
           onPress={() => BackHandler.exitApp()}
           accessibilityLabel="Salir de la app"
         >
-          <Animated.View style={[{ transform: [{ scale: exitAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.06] }) }] }, exitFocused ? { borderWidth: buttonFocusWidth, borderColor: buttonFocusBorder, borderRadius: 8, padding: 6 } : { padding: 6 }] }>
-            <Text style={{color:textColor,fontSize:20}}>🚪</Text>
+          <Animated.View style={[styles.topButtonInner, exitFocused && { borderColor: buttonFocusBorder, borderWidth: buttonFocusWidth }, { transform: [{ scale: exitAnim.interpolate({ inputRange: [0,1], outputRange: [1, 1.08] }) }] }]}>
+            <Text style={{color:textColor, fontSize:22}}>🚪</Text>
           </Animated.View>
         </Pressable>
       )}
@@ -82,13 +111,13 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
           <FocusableButton label="CERRAR" onPress={() => BackHandler.exitApp()} buttonStyle={buttonStyle} textStyle={textStyle} focusBorderColor={buttonFocusBorder} focusBorderWidth={buttonFocusWidth} />
         ) : (
           <View style={styles.socialRow}>
-            {whatsapp ? <SocialIcon icon={require('../assets/social-whatsapp.webp')} url={`https://wa.me/${whatsapp}`} /> : null}
-            {facebook ? <SocialIcon icon={require('../assets/social-facebook.webp')} url={facebook} /> : null}
-            {instagram ? <SocialIcon icon={require('../assets/social-instagram.webp')} url={instagram} /> : null}
-            {twitter ? <SocialIcon icon={require('../assets/social-twitter.webp')} url={twitter} /> : null}
-            {tiktok ? <SocialIcon icon={require('../assets/social-tiktok.webp')} url={tiktok} /> : null}
-            {youtube ? <SocialIcon icon={require('../assets/social-youtube.webp')} url={youtube} /> : null}
-            {mail ? <SocialIcon icon={require('../assets/social-mail.webp')} url={`mailto:${mail}`} /> : null}
+            {whatsapp ? <SocialIcon icon={require('../assets/social-whatsapp.webp')} url={`https://wa.me/${whatsapp}`} bg={buttonBg} /> : null}
+            {facebook ? <SocialIcon icon={require('../assets/social-facebook.webp')} url={facebook} bg={buttonBg} /> : null}
+            {instagram ? <SocialIcon icon={require('../assets/social-instagram.webp')} url={instagram} bg={buttonBg} /> : null}
+            {twitter ? <SocialIcon icon={require('../assets/social-twitter.webp')} url={twitter} bg={buttonBg} /> : null}
+            {tiktok ? <SocialIcon icon={require('../assets/social-tiktok.webp')} url={tiktok} bg={buttonBg} /> : null}
+            {youtube ? <SocialIcon icon={require('../assets/social-youtube.webp')} url={youtube} bg={buttonBg} /> : null}
+            {mail ? <SocialIcon icon={require('../assets/social-mail.webp')} url={`mailto:${mail}`} bg={buttonBg} /> : null}
           </View>
         )}
       </ScrollView>
@@ -100,14 +129,13 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
       <Modal visible={showWeb} animationType="slide" onRequestClose={() => setShowWeb(false)}>
         <WebScreen url={webUrl} onBack={() => setShowWeb(false)} bgColor={bgColor} textColor={textColor} />
       </Modal>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
@@ -121,27 +149,37 @@ const styles = StyleSheet.create({
     color: '#ddd',
     textAlign: 'center',
     marginBottom: 28,
+    fontSize: 16,
   },
   button: {
     backgroundColor: 'rgba(255,255,255,0.08)',
-    paddingVertical: 14,
-    paddingHorizontal: 26,
-    borderRadius: 8,
-    minWidth: 220,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+    minWidth: 240,
     alignItems: 'center',
     marginVertical: 8,
   },
   buttonText: {
     color: '#fff',
-    fontWeight: '600',
-  }
-  ,
-  gear: {
+    fontWeight: '700',
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+  topButton: {
     position: 'absolute',
-    right: 20,
-    padding: 8,
+    right: 16,
     zIndex: 10,
-    backgroundColor: 'transparent'
+  },
+  topButtonInner: {
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   scrollContainer: {
     alignItems: 'center',
@@ -152,23 +190,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 14,
-    marginTop: 16,
+    gap: 12,
+    marginTop: 20,
   },
   socialBtn: {
-    margin: 5,
+    margin: 4,
   },
   socialIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   socialLogo: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
   },
 });
 
@@ -191,7 +228,7 @@ function FocusableButton({ label, onPress, buttonStyle, textStyle, focusBorderCo
   );
 }
 
-function SocialIcon({ icon, url }) {
+function SocialIcon({ icon, url, bg }) {
   const [focused, setFocused] = useState(false);
   const anim = useRef(new Animated.Value(0)).current;
   const onFocus = () => { setFocused(true); Animated.timing(anim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); };
@@ -204,7 +241,7 @@ function SocialIcon({ icon, url }) {
       onPress={() => Linking.openURL(url)}
       style={styles.socialBtn}
     >
-      <Animated.View style={[styles.socialIcon, { transform: [{ scale: anim.interpolate({ inputRange: [0,1], outputRange: [1, 1.1] }) }] }, focused ? { borderWidth: 3, borderColor: '#fff' } : null]}>
+      <Animated.View style={[styles.socialIcon, { backgroundColor: bg }, { transform: [{ scale: anim.interpolate({ inputRange: [0,1], outputRange: [1, 1.1] }) }] }, focused ? { borderWidth: 3, borderColor: '#fff' } : null]}>
         <Image source={icon} style={styles.socialLogo} resizeMode="contain" />
       </Animated.View>
     </Pressable>

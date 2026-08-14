@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, StatusBar, Platform, AppState, Alert, Linking } from 'react-native';
+import { View, StyleSheet, StatusBar, Platform, AppState, Linking } from 'react-native';
 import * as Notifications from 'expo-notifications';
 // Use expo-av player in a dedicated PlayerScreen for compatibility with Expo Go
 import * as Application from 'expo-application';
@@ -72,8 +72,9 @@ export default function App() {
     loadConfig();
 
     // Check for APK update (only on sideloaded installs)
-    checkForApkUpdate().then((update) => {
-      if (update) setApkUpdate(update);
+    checkForApkUpdate().then((result) => {
+      const { debug, ...update } = result || {};
+      if (update?.version) setApkUpdate(update);
     });
 
     // Request notification permission on first app start (one-time prompt)

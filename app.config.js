@@ -2,7 +2,8 @@ export default {
   expo: {
     name: "Bragado Informa 24 TV",
     slug: "bragado-informa-24-tv",
-    version: "1.0.0",               // Iniciamos en versión 1.0.0
+    version: "1.0.1",               // Iniciamos en versión 1.0.0
+    runtimeVersion: "1.0.0",
     orientation: "default",          // "default" permite rotar en celus y fijar en TVs
     icon: "./assets/icon.png",       // Reemplaza por tu nuevo ícono cuando lo tengas
     scheme: "bi24tv",
@@ -29,7 +30,7 @@ export default {
     // Configuración obligatoria para Android Celulares y Android TV
     android: {
       package: "com.bi24.tv",        // Tu nuevo ID de paquete único
-      versionCode: 1,
+      versionCode: 2,
       googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
       tvBanner: "./assets/icon.png",
       // Mantenemos la compatibilidad nativa con controles de Smart TV
@@ -40,6 +41,18 @@ export default {
         }
       ],
     },
+
+    // Plugins de Expo
+    plugins: [
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/notification-icon.png",
+          color: "#FFFFFF"
+        }
+      ],
+      "./plugins/with-file-provider"
+    ],
 
     /* COMENTADO: NO SE CONTEMPLA IOS POR EL MOMENTO
     ios: {

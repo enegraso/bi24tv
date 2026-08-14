@@ -1,72 +1,81 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as IntentLauncher from 'expo-intent-launcher';
 
 export default function UpdateModal({ visible, version, apkUrl, changelog, onClose }) {
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [error, setError] = useState(null);
 
-  async function handleDownload() {
+  async function handleUpdate() {
+    if (!apkUrl) return;
     setDownloading(true);
-    setError(null);
+    setProgress(0);
     try {
-      const fileUri = FileSystem.cacheDirectory + `app-update-${version}.apk`;
+      const fileUri = FileSystem.cacheDirectory + 'bi24tv-update.apk';
       const downloadResumable = FileSystem.createDownloadResumable(
         apkUrl,
         fileUri,
         {},
         (downloadProgress) => {
           const p = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
-          setProgress(Math.round(p * 100));
+          setProgress(p);
         }
       );
-
       const { uri } = await downloadResumable.downloadAsync();
 
-      const cUri = await FileSystem.getContentUriAsync(uri);
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      console.log('Downloaded file size:', fileInfo.size);
+
+      if (!fileInfo.exists || fileInfo.size < 1000000) {
+        setProgress(-1);
+        return;
+      }
+
+      const contentUri = await FileSystem.getContentUriAsync(uri);
+      console.log('Content URI:', contentUri);
+
       await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: cUri,
-        flags: 1,
+        data: contentUri,
+        flags: 0x10000003,
         type: 'application/vnd.android.package-archive',
       });
     } catch (e) {
-      console.log('Download error:', e);
-      setError('No se pudo descargar. Intentá de nuevo.');
+      console.log('Update error:', e?.message || e);
     } finally {
-      setDownloading(false);
-      setProgress(0);
+      setTimeout(() => {
+        setDownloading(false);
+        setProgress(0);
+      }, 1500);
     }
   }
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={!downloading ? onClose : undefined}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Nueva versión disponible</Text>
-          <Text style={styles.version}>v{version}</Text>
-          {changelog ? <Text style={styles.changelog}>{changelog}</Text> : null}
-
           {downloading ? (
-            <View style={styles.progressContainer}>
-              <ActivityIndicator size="large" color="#fff" />
-              <Text style={styles.progressText}>{progress}%</Text>
-            </View>
-          ) : error ? (
-            <Text style={styles.error}>{error}</Text>
-          ) : null}
+            <>
+              <Text style={styles.title}>Actualizando...</Text>
+              <ActivityIndicator size="large" color="#4a90d9" style={{ marginVertical: 16 }} />
+              <Text style={styles.version}>{Math.round(progress * 100)}%</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.title}>Nueva versión disponible</Text>
+              <Text style={styles.version}>v{version}</Text>
+              {changelog ? <Text style={styles.changelog}>{changelog}</Text> : null}
 
-          <View style={styles.buttons}>
-            {!downloading && (
-              <Pressable style={[styles.btn, styles.btnUpdate]} onPress={handleDownload}>
-                <Text style={styles.btnText}>Actualizar</Text>
-              </Pressable>
-            )}
-            <Pressable style={[styles.btn, styles.btnLater]} onPress={onClose}>
-              <Text style={[styles.btnText, { color: '#ccc' }]}>Ahora no</Text>
-            </Pressable>
-          </View>
+              <View style={styles.buttons}>
+                <Pressable style={[styles.btn, styles.btnUpdate]} onPress={handleUpdate}>
+                  <Text style={styles.btnText}>Actualizar</Text>
+                </Pressable>
+                <Pressable style={[styles.btn, styles.btnLater]} onPress={onClose}>
+                  <Text style={[styles.btnText, { color: '#ccc' }]}>Ahora no</Text>
+                </Pressable>
+              </View>
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -105,22 +114,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 20,
-  },
-  progressContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-    gap: 10,
-  },
-  progressText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  error: {
-    color: '#ff6b6b',
-    fontSize: 14,
-    marginBottom: 16,
-    textAlign: 'center',
   },
   buttons: {
     flexDirection: 'row',
