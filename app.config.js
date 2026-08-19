@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "Bragado Informa 24 TV",
     slug: "bragado-informa-24-tv",
-    version: "1.0.1",               // Iniciamos en versión 1.0.0
+    version: "1.0.4",
     runtimeVersion: "1.0.0",
     orientation: "default",          // "default" permite rotar en celus y fijar en TVs
     icon: "./assets/icon.png",       // Reemplaza por tu nuevo ícono cuando lo tengas
@@ -18,7 +18,8 @@ export default {
     // OTA updates activados para buscar actualizaciones en Play Store
     updates: {
       enabled: true,
-      checkAutomatically: "ON_LAUNCH"
+      checkAutomatically: "ON_LAUNCH",
+      fallbackToCacheTimeout: 0
     },
     
     splash: {
@@ -29,21 +30,26 @@ export default {
     
     // Configuración obligatoria para Android Celulares y Android TV
     android: {
-      package: "com.bi24.tv",        // Tu nuevo ID de paquete único
-      versionCode: 2,
+      package: "com.bi24.tv",        // ID de paquete único
+      versionCode: 5,
       googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
-      tvBanner: "./assets/icon.png",
-      // Mantenemos la compatibilidad nativa con controles de Smart TV
-      intentFilters: [
-        {
-          action: "MAIN",
-          category: ["LEANBACK_LAUNCHER", "LAUNCHER"]
-        }
-      ],
+      supportsPictureInPicture: true,
+      resizeableActivity: true,
+      // Required for Android 13+ to request runtime notification permission
+      permissions: ["POST_NOTIFICATIONS"],
     },
 
     // Plugins de Expo
     plugins: [
+      [
+        "@react-native-tvos/config-tv",
+        {
+          isTV: true,
+          androidTVBanner: "./assets/bannertvplay380.png"
+        }
+      ],
+      "./plugins/fix-microphone",
+      "./plugins/fix-tv-manifest",
       [
         "expo-notifications",
         {
@@ -51,7 +57,14 @@ export default {
           color: "#FFFFFF"
         }
       ],
-      "./plugins/with-file-provider"
+      [
+        "expo-video",
+        {
+          supportsBackgroundPlayback: true,
+          supportsPictureInPicture: true
+        }
+      ],
+      "./plugins/with-file-provider",
     ],
 
     /* COMENTADO: NO SE CONTEMPLA IOS POR EL MOMENTO
@@ -60,6 +73,11 @@ export default {
       supportsTablet: true
     }
     */
+    assetBundlePatterns: ["**/*"],
+    androidStatusBar: {
+      translucent: true,
+      backgroundColor: "#000000"
+    },
   }
 };
 
