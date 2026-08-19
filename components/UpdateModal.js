@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, StyleSheet, ActivityIndicator } from 'react-native';
+import FocusableButton from './FocusableButton';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as IntentLauncher from 'expo-intent-launcher';
 
@@ -67,12 +68,18 @@ export default function UpdateModal({ visible, version, apkUrl, changelog, onClo
               {changelog ? <Text style={styles.changelog}>{changelog}</Text> : null}
 
               <View style={styles.buttons}>
-                <Pressable style={[styles.btn, styles.btnUpdate]} onPress={handleUpdate}>
-                  <Text style={styles.btnText}>Actualizar</Text>
-                </Pressable>
-                <Pressable style={[styles.btn, styles.btnLater]} onPress={onClose}>
-                  <Text style={[styles.btnText, { color: '#ccc' }]}>Ahora no</Text>
-                </Pressable>
+                <FocusableButton
+                  label="Actualizar"
+                  onPress={handleUpdate}
+                  buttonStyle={[styles.btn, styles.btnUpdate]}
+                  textStyle={styles.btnText}
+                />
+                <FocusableButton
+                  label="Ahora no"
+                  onPress={onClose}
+                  buttonStyle={[styles.btn, styles.btnLater]}
+                  textStyle={[styles.btnText, { color: '#ccc' }]}
+                />
               </View>
             </>
           )}
