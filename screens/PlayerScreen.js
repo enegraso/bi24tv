@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, StyleSheet, StatusBar, Pressable, Text, BackHandler, Platform } from 'react-native';
+import { View, StyleSheet, StatusBar, Text, BackHandler, Platform } from 'react-native';
 import { Video } from 'expo-av';
 import * as KeepAwake from 'expo-keep-awake';
 
@@ -8,7 +8,9 @@ try {
   TVEventHandler = require('react-native').TVEventHandler;
 } catch (e) {}
 
-export default function PlayerScreen({ streamUrl, onBack, bgColor = '#000', buttonBg = 'rgba(255,255,255,0.1)', textColor = '#fff' }) {
+import FocusableButton from '../components/FocusableButton';
+
+export default function PlayerScreen({ streamUrl, onBack, bgColor = '#000', buttonBg = 'rgba(255,255,255,0.1)', textColor = '#fff', buttonFocusBorder = '#fff', buttonFocusWidth = 3 }) {
   const isTV = Platform.isTV;
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(null);
@@ -104,15 +106,17 @@ export default function PlayerScreen({ streamUrl, onBack, bgColor = '#000', butt
         <View style={styles.overlay} pointerEvents="box-none">
           <Text style={[styles.errorText, { color: textColor }]}>No se pudo reproducir el stream.</Text>
           <Text style={[styles.errorTextSmall, { color: textColor }]}>{error}</Text>
-          <Pressable
-            style={[styles.retryButton, { backgroundColor: buttonBg }]}
+          <FocusableButton
+            label="REINTENTAR"
             onPress={() => {
               setError(null);
               setReady(false);
             }}
-          >
-            <Text style={[styles.retryText, { color: textColor }]}>REINTENTAR</Text>
-          </Pressable>
+            buttonStyle={[styles.retryButton, { backgroundColor: buttonBg }]}
+            textStyle={[styles.retryText, { color: textColor }]}
+            focusBorderColor={buttonFocusBorder}
+            focusBorderWidth={buttonFocusWidth}
+          />
         </View>
       ) : !ready ? (
         <View style={styles.loadingOverlay} pointerEvents="none">

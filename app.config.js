@@ -44,7 +44,8 @@ export default {
       [
         "@react-native-tvos/config-tv",
         {
-          androidTVBanner: "./assets/bannertvplay.png"
+          isTV: true,
+          androidTVBanner: "./assets/bannertvplay380.png"
         }
       ],
       "./plugins/fix-microphone",

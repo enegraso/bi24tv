@@ -5,6 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { getExpoPushTokenAsync } from '../app/services/notifications';
 import SettingsScreen from '../app/screens/SettingsScreen';
 import WebScreen from './WebScreen';
+import FocusableButton from '../components/FocusableButton';
+import SocialIcon from '../components/SocialIcon';
 
 function darkenColor(hex, factor = 0.7) {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -111,13 +113,13 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
           <FocusableButton label="CERRAR" onPress={() => BackHandler.exitApp()} buttonStyle={buttonStyle} textStyle={textStyle} focusBorderColor={buttonFocusBorder} focusBorderWidth={buttonFocusWidth} />
         ) : (
           <View style={styles.socialRow}>
-            {whatsapp ? <SocialIcon icon={require('../assets/social-whatsapp.webp')} url={`https://wa.me/${whatsapp}`} bg={buttonBg} /> : null}
-            {facebook ? <SocialIcon icon={require('../assets/social-facebook.webp')} url={facebook} bg={buttonBg} /> : null}
-            {instagram ? <SocialIcon icon={require('../assets/social-instagram.webp')} url={instagram} bg={buttonBg} /> : null}
-            {twitter ? <SocialIcon icon={require('../assets/social-twitter.webp')} url={twitter} bg={buttonBg} /> : null}
-            {tiktok ? <SocialIcon icon={require('../assets/social-tiktok.webp')} url={tiktok} bg={buttonBg} /> : null}
-            {youtube ? <SocialIcon icon={require('../assets/social-youtube.webp')} url={youtube} bg={buttonBg} /> : null}
-            {mail ? <SocialIcon icon={require('../assets/social-mail.webp')} url={`mailto:${mail}`} bg={buttonBg} /> : null}
+            {whatsapp ? <SocialIcon icon={require('../assets/social-whatsapp.webp')} url={`https://wa.me/${whatsapp}`} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
+            {facebook ? <SocialIcon icon={require('../assets/social-facebook.webp')} url={facebook} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
+            {instagram ? <SocialIcon icon={require('../assets/social-instagram.webp')} url={instagram} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
+            {twitter ? <SocialIcon icon={require('../assets/social-twitter.webp')} url={twitter} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
+            {tiktok ? <SocialIcon icon={require('../assets/social-tiktok.webp')} url={tiktok} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
+            {youtube ? <SocialIcon icon={require('../assets/social-youtube.webp')} url={youtube} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
+            {mail ? <SocialIcon icon={require('../assets/social-mail.webp')} url={`mailto:${mail}`} bg={buttonBg} imageStyle={styles.socialLogo} style={styles.socialBtn} /> : null}
           </View>
         )}
       </ScrollView>
@@ -127,7 +129,7 @@ export default function HomeScreen({ onStart, logoUrl, bgColor = '#000', buttonB
       </Modal>
 
       <Modal visible={showWeb} animationType="slide" onRequestClose={() => setShowWeb(false)}>
-        <WebScreen url={webUrl} onBack={() => setShowWeb(false)} bgColor={bgColor} textColor={textColor} />
+        <WebScreen url={webUrl} onBack={() => setShowWeb(false)} bgColor={bgColor} textColor={textColor} buttonFocusBorder={buttonFocusBorder} buttonFocusWidth={buttonFocusWidth} />
       </Modal>
     </LinearGradient>
   );
@@ -209,41 +211,4 @@ const styles = StyleSheet.create({
   },
 });
 
-function FocusableButton({ label, onPress, buttonStyle, textStyle, focusBorderColor, focusBorderWidth }) {
-  const [focused, setFocused] = useState(false);
-  const anim = useRef(new Animated.Value(0)).current;
-  const onFocus = () => { setFocused(true); Animated.timing(anim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); };
-  const onBlur = () => { setFocused(false); Animated.timing(anim, { toValue: 0, duration: 120, easing: Easing.in(Easing.ease), useNativeDriver: true }).start(); };
-  return (
-    <Pressable
-      focusable={true}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onPress={onPress}
-    >
-      <Animated.View style={[buttonStyle, { transform: [{ scale: anim.interpolate({ inputRange: [0,1], outputRange: [1, 1.04] }) }] }, focused ? { borderWidth: focusBorderWidth, borderColor: focusBorderColor } : null]}>
-        <Text style={textStyle}>{label}</Text>
-      </Animated.View>
-    </Pressable>
-  );
-}
-
-function SocialIcon({ icon, url, bg }) {
-  const [focused, setFocused] = useState(false);
-  const anim = useRef(new Animated.Value(0)).current;
-  const onFocus = () => { setFocused(true); Animated.timing(anim, { toValue: 1, duration: 180, easing: Easing.out(Easing.ease), useNativeDriver: true }).start(); };
-  const onBlur = () => { setFocused(false); Animated.timing(anim, { toValue: 0, duration: 120, easing: Easing.in(Easing.ease), useNativeDriver: true }).start(); };
-  return (
-    <Pressable
-      focusable={true}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onPress={() => Linking.openURL(url)}
-      style={styles.socialBtn}
-    >
-      <Animated.View style={[styles.socialIcon, { backgroundColor: bg }, { transform: [{ scale: anim.interpolate({ inputRange: [0,1], outputRange: [1, 1.1] }) }] }, focused ? { borderWidth: 3, borderColor: '#fff' } : null]}>
-        <Image source={icon} style={styles.socialLogo} resizeMode="contain" />
-      </Animated.View>
-    </Pressable>
-  );
-}
+// FocusableButton and SocialIcon implemented as reusable components in ../components/

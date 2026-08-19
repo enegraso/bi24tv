@@ -1,16 +1,34 @@
-import React from 'react';
-import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, ActivityIndicator, Text, BackHandler, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FocusableButton from '../components/FocusableButton';
 
-export default function WebScreen({ url, onBack, bgColor = '#000', textColor = '#fff' }) {
+export default function WebScreen({ url, onBack, bgColor = '#000', textColor = '#fff', buttonFocusBorder = '#fff', buttonFocusWidth = 3 }) {
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    const onHardwareBack = () => {
+      try { onBack && onBack(); } catch (e) {}
+      return true;
+    };
+    if (Platform.OS === 'android' || Platform.isTV) {
+      const sub = BackHandler.addEventListener('hardwareBackPress', onHardwareBack);
+      return () => sub?.remove();
+    }
+    return undefined;
+  }, [onBack]);
 
   return (
     <View style={[styles.container, { backgroundColor: bgColor, paddingTop: insets.top }]}>
-      <TouchableOpacity onPress={onBack} style={[styles.backBtn, { top: insets.top + 8 }]}>
-        <Text style={[styles.backText, { color: textColor }]}>← Volver</Text>
-      </TouchableOpacity>
+      <FocusableButton
+        label="← Volver"
+        onPress={onBack}
+        buttonStyle={[styles.backBtn, { top: insets.top + 8 }]}
+        textStyle={[styles.backText, { color: textColor }]}
+        focusBorderColor={buttonFocusBorder}
+        focusBorderWidth={buttonFocusWidth}
+      />
       <WebView
         source={{ uri: url }}
         style={styles.webview}
