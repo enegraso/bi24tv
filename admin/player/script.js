@@ -248,19 +248,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
           setupQualitySelector();
 
-          video.play()
-            .then(() => {
-
-              hideMessage();
-
-              retryCount = 0;
-
-            })
-            .catch(err => {
-
-              console.log("Play error:", err);
-
-            });
+          hideMessage();
+          retryCount = 0;
 
         }
       );
@@ -295,8 +284,6 @@ document.addEventListener("DOMContentLoaded", () => {
       video.addEventListener(
         "loadedmetadata",
         () => {
-
-          video.play();
 
           hideMessage();
 
