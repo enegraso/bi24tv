@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bragado Informa 24 TV en vivo</title>
+  <link rel="stylesheet" href="https://unpkg.com/plyr@3/dist/plyr.css">
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
+  <script src="https://unpkg.com/plyr@3"></script>
+  <!-- Google Cast sender SDK -->
+  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  <script src="./script.js" defer></script>
+</head>
+
+<body>
+  <main class="page">
+    <section class="player-card">
+      <div class="player-wrapper">
+        <video id="videoPlayer" class="video" controls autoplay muted playsinline webkit-playsinline preload="auto"
+          crossorigin></video>
+        <div id="reconnectMessage" class="reconnect-message">
+          Reconectando señal...
+        </div>
+        <div class="player-custom-controls" id="customControls">
+          <button class="pip-button" type="button" id="pipButton" title="Picture-in-Picture">
+            <img src="./assets/pip.svg" alt="PiP" width="20" height="20">
+          </button>
+          <button class="cast-button" type="button" id="castButton" title="Transmitir / AirPlay">
+            <img src="./assets/cast.svg" alt="Cast" width="20" height="20">
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>

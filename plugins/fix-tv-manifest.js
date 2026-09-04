@@ -65,6 +65,24 @@ module.exports = function fixTvManifest(config) {
           mainActivity['intent-filter'].push(newIntent);
         }
       }
+      // Remove any fixed screenOrientation on activities (e.g. portrait) that
+      // can cause Play Console to mark the app as not compatible with large
+      // screens / TV devices. Some libraries (ML Kit barcode scanner) add an
+      // activity locked to portrait; remove that attribute so the app is
+      // considered flexible for TV/large screens.
+      for (const act of activities) {
+        try {
+          if (act.$ && act.$['android:screenOrientation']) {
+            const val = String(act.$['android:screenOrientation']).toLowerCase();
+            if (val.includes('portrait') || val.includes('locked') || val === 'nosensor') {
+              delete act.$['android:screenOrientation'];
+            }
+          }
+        } catch (e) {
+          // keep plugin robust; if something unexpected occurs, don't fail the
+          // manifest modification.
+        }
+      }
     }
 
     return config;
