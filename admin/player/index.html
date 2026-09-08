@@ -20,10 +20,15 @@
       <div class="player-wrapper">
         <video id="videoPlayer" class="video" controls muted playsinline webkit-playsinline preload="auto"
           crossorigin></video>
+        <canvas id="frameCapture" style="display:none;"></canvas>
+        <div id="previewLoader" class="preview-loader">
+          <div class="preview-spinner"></div>
+          <span>Cargando preview...</span>
+        </div>
         <div id="reconnectMessage" class="reconnect-message">
           Reconectando señal...
         </div>
-        <div class="player-custom-controls" id="customControls">
+        <div class="player-custom-controls" id="customControls" style="display:none;">
           <button class="pip-button" type="button" id="pipButton" title="Picture-in-Picture">
             <img src="./assets/pip.svg" alt="PiP" width="20" height="20">
           </button>
